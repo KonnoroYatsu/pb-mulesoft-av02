@@ -1,0 +1,16 @@
+package factory;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+public class ConnectionFactory {
+	/*Criando a conexão com o banco onde "loja" é o nome que atrbuimos 
+	 na tag name do <persistence-unit> no arquivo persistence.xml*/
+	private static final EntityManagerFactory FACTORY = Persistence
+			.createEntityManagerFactory("pb_quz"); 
+
+	public static EntityManager getEntityManager() {
+		return FACTORY.createEntityManager();
+	}
+}

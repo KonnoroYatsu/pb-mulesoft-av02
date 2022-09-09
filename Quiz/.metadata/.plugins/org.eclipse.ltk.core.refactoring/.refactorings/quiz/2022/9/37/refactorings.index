@@ -1,0 +1,7 @@
+1662658605864	Move file
+1662658623886	Rename resource 'hibernate.cfg.xml'
+1662662286812	Rename type 'Pergunta'
+1662662354183	Move compilation units
+1662664043153	Extract method 'buscarQuestoes'
+1662675522671	Rename type 'connectionFactory'
+1662675536894	Rename type 'quiz'

@@ -1,0 +1,57 @@
+package modelos;
+
+import java.time.LocalDate;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "resultados")
+public class Resultado {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	private String jogador;
+	private int acertos;
+	private int erros;
+	@Column(name = "data_da_partida")
+	private LocalDate dataDaPartida;
+	
+	public Resultado() {}
+	
+	public String getJogador() {
+		return this.jogador;
+	}
+	
+	public void setJogador(String jogador) {
+		this.jogador = jogador;
+	}
+	
+	public int getAcertos() {
+		return this.acertos;
+	}
+	
+	public void incrementaAcerto() {
+		this.acertos++;
+	}
+	
+	public void incrementaErro() {
+		this.erros++;
+	}
+	
+	public int getErros() {
+		return this.erros;
+	}
+	
+	public LocalDate getDataDaPartida() {
+		return this.dataDaPartida;
+	}
+	
+	public void setDataDaPartida() {
+		this.dataDaPartida = LocalDate.now();
+	}
+}

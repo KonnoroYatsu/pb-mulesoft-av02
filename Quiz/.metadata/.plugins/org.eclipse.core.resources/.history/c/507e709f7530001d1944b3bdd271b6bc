@@ -1,0 +1,141 @@
+package teste;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Scanner;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+
+import org.hibernate.QueryException;
+
+import dao.QuestaoDao;
+import dao.ResultadoDao;
+import factory.ConnectionFactory;
+import modelos.Questao;
+import modelos.Resultado;
+
+public class Quiz {
+	public static void main(String[] args) {
+		Scanner teclado = new Scanner(System.in);
+		int opcao = 0;
+		boolean primeiraRun = true;
+		
+		try {
+			//Gerando conexão com o banco de dados.
+			EntityManager conexao = ConnectionFactory.getEntityManager();
+			
+			//Inicio do menu inicial.
+			do {
+				/*Esse IF é sómente para alterar o texto da primeira opção caso o
+				usuário esteja jogando pela primeira vez. A variável é alterada 
+				após o usuário finalizar o quiz*/
+				if(primeiraRun) {
+					System.out.printf("\n1 - Jogar\n");
+				}else {
+					System.out.printf("\n1 - Jogar novamente\n");
+				}
+				System.out.println("2 - Ver placar");
+				System.out.println("0 - Sair");
+				System.out.print("Selecione uma opção: ");
+				opcao = Integer.parseInt(teclado.nextLine());
+				
+				if(opcao == 1) {
+					iniciarQuiz(conexao); //Chama o método que inicia o quiz passando a conexão com o banco.
+					primeiraRun = false; //Agora não será mais a primeira vez que o usuário joga.
+				}else if(opcao == 2) {
+					mostraPlacar(conexao); //Chama o método que exibe o placar, passando a conexão com o banco.
+				}else if(opcao == 0) {
+					//Agradecimento por jogar e fechando a conexão com o banco.
+					System.out.printf("\nObrigado por jogar!");
+					conexao.close();
+				}
+				else {
+					//Caso o usário selecione alguma opção que não pertença ao menu.
+					System.out.printf("\nOpção inválida, por favor tente novamente!\n");
+				}
+			}while(opcao != 0); //O usuário sempre irá voltar para o menu enquanto não escolher "0";
+		}catch (PersistenceException e) { 
+			/*Recebe a PersistenceException gerada pela classe ConnectionFactory 
+			e exibe a mensagem de erro caso algo de errado na conexão.*/
+			System.out.println(e.getMessage()); 
+		}
+	}
+
+	private static void mostraPlacar(EntityManager conexao) {
+		try {
+			/*Envia a conexão com o banco para a classe ResultadoDao, que através desta 
+			conexão	realiza a busca no banco de dados e retorna uma lista com os resultados.*/
+			List<Resultado> resultados = new ResultadoDao(conexao).buscar(); 
+			try {
+				//Exibição dos resultados.
+				for(int i = 0; i < resultados.size(); i++) {
+					System.out.printf("\nJOGADOR: %-13s \tACERTOS: %d \tDATA: %s",
+							resultados.get(i).getJogador(),
+							resultados.get(i).getAcertos(),
+							resultados.get(i).getDataDaPartida().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+				}
+				System.out.println();
+			}catch (Exception e) {
+				//Sómente precaução em caso de um NullPointerException ou qualquer outra que possa acontecer.
+				System.out.println("Acorreu um erro inesperado!"); 
+			}
+		}catch (QueryException e) {
+			/*Recebe a QueryException gerada pela classe ResultadoDao e exibe 
+			 *a mensagem de erro caso algo de errado no momento da consulta.*/
+			System.out.println(e.getMessage());
+		}	
+	}
+	
+	private static void iniciarQuiz(EntityManager conexao) {	
+		Scanner teclado = new Scanner(System.in);
+		int resposta;
+		boolean bResposta = false;
+		Resultado resultado = new Resultado();
+				
+		System.out.printf("\nInsira seu nome: ");
+		resultado.setJogador(teclado.nextLine()); //Gravando o nome do jogador.
+		
+		try {
+			/*Envia a conexão com o banco para a classe QuestaoDao, que através desta 
+			conexão	realiza a busca no banco de dados e retorna uma lista com as questões.*/
+			List<Questao> questoes = new QuestaoDao(conexao).buscarAtivas();
+			try {
+				for(int i = 0; i < questoes.size(); i++) {			
+					do {
+						System.out.printf("\n%d) %s\n", i+1, questoes.get(i).getPergunta());
+						System.out.print("Insira 1 para VERDADEIRO ou 2 para FALSO: ");
+						resposta = Integer.parseInt(teclado.nextLine());			
+						if(resposta == 1) {
+							bResposta = true;
+						}else if(resposta == 2) {
+							bResposta = false;
+						}else {
+							System.out.println("\nOpção inválida, por favor tente novamente!");
+						}
+					}while(resposta != 1 && resposta != 2);
+					
+					if(questoes.get(i).isVerdadeira() == bResposta) {
+						System.out.println("Parabens, você acertou!");
+						resultado.incrementaAcerto();;
+					}else {
+						System.out.println("Que pena, você errou!");
+						resultado.incrementaErro();
+					}
+				}
+			}catch (Exception e) {
+				//Sómente precaução em caso de um NullPointerException ou qualquer outra que possa acontecer.
+				System.out.println("Acorreu um erro inesperado!");
+			}
+			resultado.gravaData();
+			ResultadoDao resultadoDao = new ResultadoDao(conexao);
+			conexao.getTransaction().begin();
+			resultadoDao.gravar(resultado);
+			conexao.getTransaction().commit();	
+		}catch (QueryException e) {
+			/*Recebe a QueryException gerada pela classe QuestaoDao e exibe 
+			 *a mensagem de erro caso algo de errado no momento da consulta.*/
+			System.out.println(e.getMessage());
+		}	
+	}
+}

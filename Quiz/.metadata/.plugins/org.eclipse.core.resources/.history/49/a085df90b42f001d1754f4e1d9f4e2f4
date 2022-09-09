@@ -1,0 +1,16 @@
+package modelos;
+
+import java.time.LocalDate;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(nome = "resultados")
+public class Resultado {
+	private int id;
+	private String jogador;
+	private int acertos;
+	private int erros;
+	private LocalDate dataDaPartida = LocalDate.now();
+}

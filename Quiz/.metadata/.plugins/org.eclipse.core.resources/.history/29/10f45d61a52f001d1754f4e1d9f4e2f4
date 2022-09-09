@@ -1,0 +1,11 @@
+package dao;
+
+import javax.persistence.Entity;
+
+@Entity
+public class Pergunta {
+	private int id;
+	private String pergunta;
+	private boolean verdadeira;
+	private boolean ativa;
+}

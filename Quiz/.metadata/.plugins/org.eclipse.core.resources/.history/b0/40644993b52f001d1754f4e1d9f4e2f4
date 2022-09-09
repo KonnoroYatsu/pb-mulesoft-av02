@@ -1,0 +1,11 @@
+package dao;
+
+import javax.persistence.EntityManager;
+
+public class ResultadoDao {
+private EntityManager em;
+	
+	public QuestaoDao(EntityManager em) {
+		this.em = em;
+	}
+}

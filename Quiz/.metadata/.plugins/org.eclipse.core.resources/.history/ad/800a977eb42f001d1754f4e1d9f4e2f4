@@ -1,0 +1,11 @@
+package modelos;
+
+import java.time.LocalDate;
+
+public class Resultado {
+	private int id;
+	private String jogador;
+	private int acertos;
+	private int erros;
+	private LocalDate dataDaPartida = LocalDate.now();
+}

@@ -1,0 +1,29 @@
+package dao;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+
+import org.hibernate.QueryException;
+
+import modelos.Questao;
+
+public class QuestaoDao {
+
+	private EntityManager em;
+	
+	public QuestaoDao(EntityManager em) {
+		this.em = em;
+	}
+	
+	public List<Questao> buscarAtivas(){
+		try {
+			boolean ativa = true;
+			String jpql = "SELECT q FROM Questao q WHERE q.ativ = :ativa";			
+			return this.em.createQuery(jpql, Questao.class).setParameter("ativa", ativa).getResultList();
+		} catch(Exception e) {
+			System.out.println(e.toString());
+			throw new QueryException("Houve um erro ao buscar as questões no banco de dados!");
+		}
+	}
+}

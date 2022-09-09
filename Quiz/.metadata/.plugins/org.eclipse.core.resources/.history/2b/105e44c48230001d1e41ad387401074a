@@ -1,0 +1,19 @@
+package factory;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
+
+public class ConnectionFactory {
+	private static EntityManagerFactory factory; 
+
+	public static EntityManager getEntityManager() {
+		try {
+			factory = Persistence.createEntityManagerFactory("pb_quiz02");
+			return factory.createEntityManager();
+		}catch (Exception e) {
+			throw new PersistenceException("Houve um erro inesperado ao conectar com o banco de dados!");
+		}
+	}
+}

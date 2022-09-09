@@ -1,0 +1,13 @@
+package modelos;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "questoes");
+public class Questao {
+	private int id;
+	private String pergunta;
+	private boolean verdadeira;
+	private boolean ativa;
+}
